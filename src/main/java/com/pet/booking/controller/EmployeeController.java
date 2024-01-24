@@ -2,15 +2,12 @@ package com.pet.booking.controller;
 
 import com.pet.booking.models.Employee;
 import com.pet.booking.repo.EmployeeRepo;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,8 +24,12 @@ public class EmployeeController {
     private EmployeeRepo employeeRepo;
     Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
+    @GetMapping(value = "/getEmployees")
+    public List<Employee> getEmployees() {
+        return employeeRepo.findAll();
+    }
 
-    @PostMapping(value = "/addEmployee", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<HttpStatus> addEmployee(@RequestBody final Employee employee) {
         //add email constraint validation
         if (employeeRepo.findByEmail(employee.getEmail()) != null) {
@@ -48,8 +49,25 @@ public class EmployeeController {
         logger.info(String.format("Deleted user with %s id.", id));
     }
 
-    @GetMapping(value = "/getEmployees")
-    public List<Employee> getEmployees() {
-        return employeeRepo.findAll();
+    @PutMapping(value = "/update/{id}")
+    public void updateEmployee(@PathVariable long id, @RequestBody Employee employee) {
+        if (employeeRepo.findById(id).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
+        }
+        Employee userToUpdate = employeeRepo.findById(id).get();
+
+        userToUpdate.setId(id);
+        userToUpdate.setEmail(employee.getEmail());
+        userToUpdate.setPricing(employee.getPricing());
+        userToUpdate.setFirstName(employee.getFirstName());
+        userToUpdate.setLastName(employee.getLastName());
+
+        // fix constraint error issue
+        employeeRepo.save(userToUpdate);
+    }
+
+    @GetMapping(value = "/{id}")
+    public Employee findById(@PathVariable long id) {
+        return ResponseEntity.ok(employeeRepo.findById(id).get()).getBody();
     }
 }
