@@ -19,4 +19,6 @@ public class Employee {
     private int pricing;
     @Column(unique = true)
     private String email;
+    @Column
+    private String phoneNumber;
 }
