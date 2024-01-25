@@ -57,10 +57,12 @@ public class EmployeeController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
         }
         Employee userToUpdate = findById.get();
+
         userToUpdate.setPricing(employee.getPricing());
         userToUpdate.setFirstName(employee.getFirstName());
         userToUpdate.setLastName(employee.getLastName());
         userToUpdate.setPhoneNumber(employee.getPhoneNumber());
+        userToUpdate.setEmail(employee.getEmail());
         employeeRepo.save(userToUpdate);
     }
 
