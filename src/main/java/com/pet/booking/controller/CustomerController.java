@@ -1,8 +1,10 @@
 package com.pet.booking.controller;
 
+import com.pet.booking.dto.CustomerDTO;
 import com.pet.booking.models.Customer;
 import com.pet.booking.repo.CustomerRepo;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomerController {
     @Autowired
     private CustomerRepo customerRepo;
+    private ModelMapper mapper = new ModelMapper();
     Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
@@ -60,11 +63,11 @@ public class CustomerController {
     }
 
     @GetMapping(value = "/{id}")
-    public Customer findById(@PathVariable long id) {
-        Optional<Customer> employee = customerRepo.findById(id);
-        if (employee.isEmpty()) {
+    public CustomerDTO findById(@PathVariable long id) {
+        Optional<Customer> customer = customerRepo.findById(id);
+        if (customer.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
         }
-        return ResponseEntity.ok(employee.get()).getBody();
+        return ResponseEntity.ok(mapper.map(customer, CustomerDTO.class)).getBody();
     }
 }

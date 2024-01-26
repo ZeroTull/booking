@@ -1,25 +1,15 @@
-package com.pet.booking.models;
+package com.pet.booking.dto;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-@Entity
-@Table(name = "customer")
-public class Customer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CustomerDTO {
     private long id;
-    @Column
     private String firstName;
-    @Column
     private String lastName;
-    @Column(unique = true)
     private String email;
-    @Column
     private String password;
-    @Column
     private String phoneNumber;
 }

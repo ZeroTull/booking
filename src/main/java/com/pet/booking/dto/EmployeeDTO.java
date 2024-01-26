@@ -1,30 +1,16 @@
-package com.pet.booking.models;
+package com.pet.booking.dto;
 
 import com.pet.booking.enums.JobType;
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-@Entity
-@Table(name = "employee")
-public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class EmployeeDTO {
     private long id;
-    @Column
     private String firstName;
-    @Column
     private String lastName;
-    @Column
     private JobType[] jobTypes;  //todo - validate in db //add validaion onto 'add' entpoint via fromString or smth like that
-    @Column(unique = true)
     private String email;
-    @Column
-    private String password;
-    @Column
     private String phoneNumber;
-    @Column
-    boolean isAdmin = false;
 }
