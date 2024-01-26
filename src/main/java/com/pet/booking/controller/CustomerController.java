@@ -24,7 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomerController {
     @Autowired
     private CustomerRepo customerRepo;
-    private ModelMapper mapper = new ModelMapper();
+    private final ModelMapper mapper = new ModelMapper();
     Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)

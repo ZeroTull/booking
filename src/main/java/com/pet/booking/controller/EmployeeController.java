@@ -1,8 +1,11 @@
 package com.pet.booking.controller;
 
+import com.pet.booking.dto.EmployeeDTO;
 import com.pet.booking.models.Employee;
 import com.pet.booking.repo.EmployeeRepo;
+import com.pet.booking.utils.ObjectMapperUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.pet.booking.controller.ApiDefinition.EMPLOYEE_RESOURCE_ROOT;
@@ -23,10 +27,11 @@ public class EmployeeController {
     @Autowired
     private EmployeeRepo employeeRepo;
     Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+    private final ModelMapper mapper = new ModelMapper();
 
     @GetMapping(value = "/getEmployees")
-    public Iterable<Employee> getEmployees() {
-        return employeeRepo.findAllByOrderByIdDesc();
+    public List<EmployeeDTO> getEmployees() {
+        return ObjectMapperUtils.mapAll(employeeRepo.findAllByOrderByIdDesc(), EmployeeDTO.class);
     }
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
