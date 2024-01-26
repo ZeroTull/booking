@@ -1,7 +1,9 @@
 package com.pet.booking.controller;
 
+import com.pet.booking.dto.EmployeeDTO;
 import com.pet.booking.models.Employee;
 import com.pet.booking.repo.EmployeeRepo;
+import com.pet.booking.utils.ObjectMapperUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.pet.booking.controller.ApiDefinition.EMPLOYEE_RESOURCE_ROOT;
@@ -25,8 +28,8 @@ public class EmployeeController {
     Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @GetMapping(value = "/getEmployees")
-    public Iterable<Employee> getEmployees() {
-        return employeeRepo.findAllByOrderByIdDesc();
+    public List<EmployeeDTO> getEmployees() {
+        return ObjectMapperUtils.mapAll(employeeRepo.findAllByOrderByIdDesc(), EmployeeDTO.class);
     }
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
@@ -43,7 +46,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping(value = "/delete")
-    public void addEmployee(@RequestHeader long id) {
+    public void deleteEmployee(@RequestHeader long id) {
         //add verification if employee exists
         employeeRepo.deleteById(id);
         logger.info(String.format("Deleted user with %s id.", id));
@@ -60,7 +63,7 @@ public class EmployeeController {
 
         updatedEmployee.setFirstName(employee.getFirstName());
         updatedEmployee.setLastName(employee.getLastName());
-        updatedEmployee.setJobTypes(employee.getJobTypes());
+        updatedEmployee.setServices(employee.getServices());
         updatedEmployee.setEmail(employee.getEmail());
         updatedEmployee.setPassword(employee.getPassword());  // Todo add separate service to create/update password
         updatedEmployee.setPhoneNumber(employee.getPhoneNumber());

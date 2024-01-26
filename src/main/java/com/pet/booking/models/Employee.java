@@ -1,9 +1,11 @@
 package com.pet.booking.models;
 
-import com.pet.booking.enums.JobType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.antlr.v4.runtime.misc.NotNull;
+
+import java.util.List;
 
 @Data
 @Accessors(chain = true)
@@ -13,17 +15,24 @@ public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    //private File photo;  //todo - check how to store and how to return via api - separate table for photos
     @Column
+    @NotNull
     private String firstName;
     @Column
+    @NotNull
     private String lastName;
-    @Column
-    private JobType[] jobTypes;  //todo - validate in db //add validaion onto 'add' entpoint via fromString or smth like that
+    @ElementCollection
+    @CollectionTable(name = "listOfServices")
+    private List<Service> services;  //todo - validate in db //add validaion onto 'add' entpoint via fromString or smth like that
     @Column(unique = true)
+    @NotNull
     private String email;
     @Column
+    @NotNull
     private String password;
     @Column
+    @NotNull
     private String phoneNumber;
     @Column
     boolean isAdmin = false;
