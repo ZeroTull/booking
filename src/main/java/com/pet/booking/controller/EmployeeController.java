@@ -26,7 +26,7 @@ public class EmployeeController {
 
     @GetMapping(value = "/getEmployees")
     public Iterable<Employee> getEmployees() {
-        return employeeRepo.findAll();
+        return employeeRepo.findAllByOrderByIdDesc();
     }
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
@@ -56,14 +56,17 @@ public class EmployeeController {
         if (findById.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
         }
-        Employee userToUpdate = findById.get();
+        Employee updatedEmployee = findById.get();
 
-        userToUpdate.setPricing(employee.getPricing());
-        userToUpdate.setFirstName(employee.getFirstName());
-        userToUpdate.setLastName(employee.getLastName());
-        userToUpdate.setPhoneNumber(employee.getPhoneNumber());
-        userToUpdate.setEmail(employee.getEmail());
-        employeeRepo.save(userToUpdate);
+        updatedEmployee.setFirstName(employee.getFirstName());
+        updatedEmployee.setLastName(employee.getLastName());
+        updatedEmployee.setJobTypes(employee.getJobTypes());
+        updatedEmployee.setEmail(employee.getEmail());
+        updatedEmployee.setPassword(employee.getPassword());  // Todo add separate service to create/update password
+        updatedEmployee.setPhoneNumber(employee.getPhoneNumber());
+        updatedEmployee.setAdmin(employee.isAdmin());
+
+        employeeRepo.save(updatedEmployee);
     }
 
     @GetMapping(value = "/{id}")
