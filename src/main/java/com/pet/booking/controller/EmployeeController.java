@@ -5,7 +5,6 @@ import com.pet.booking.models.Employee;
 import com.pet.booking.repo.EmployeeRepo;
 import com.pet.booking.utils.ObjectMapperUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ public class EmployeeController {
     @Autowired
     private EmployeeRepo employeeRepo;
     Logger logger = LoggerFactory.getLogger(EmployeeController.class);
-    private final ModelMapper mapper = new ModelMapper();
 
     @GetMapping(value = "/getEmployees")
     public List<EmployeeDTO> getEmployees() {
@@ -48,7 +46,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping(value = "/delete")
-    public void addEmployee(@RequestHeader long id) {
+    public void deleteEmployee(@RequestHeader long id) {
         //add verification if employee exists
         employeeRepo.deleteById(id);
         logger.info(String.format("Deleted user with %s id.", id));
@@ -65,7 +63,7 @@ public class EmployeeController {
 
         updatedEmployee.setFirstName(employee.getFirstName());
         updatedEmployee.setLastName(employee.getLastName());
-        updatedEmployee.setJobTypes(employee.getJobTypes());
+        updatedEmployee.setServices(employee.getServices());
         updatedEmployee.setEmail(employee.getEmail());
         updatedEmployee.setPassword(employee.getPassword());  // Todo add separate service to create/update password
         updatedEmployee.setPhoneNumber(employee.getPhoneNumber());
