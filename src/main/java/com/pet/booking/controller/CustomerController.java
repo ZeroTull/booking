@@ -15,7 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
-import static com.pet.booking.controller.ApiDefinition.CUSTOMER_RESOURCE_ROOT;
+import static com.pet.booking.controller.base.ApiDefinition.CUSTOMER_RESOURCE_ROOT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -68,6 +68,7 @@ public class CustomerController {
         if (customer.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
         }
+        //todo fix this - returns empty dto, mapping does not work.
         return ResponseEntity.ok(mapper.map(customer, CustomerDTO.class)).getBody();
     }
 }

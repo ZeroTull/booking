@@ -2,24 +2,35 @@ package com.pet.booking.models.bookingCalendar;
 
 import com.pet.booking.enums.ServiceType;
 import jakarta.persistence.*;
+import lombok.Data;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
+@Data
 @Entity
-@Table(name = "booking_entry")
-public class BookingEntry {
+@Table(name = "appointment")
+public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @Column
+    @NotNull
     private int employeeId;
+
     @Column
+    @NotNull
     private int customerId;
+
     @Column
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
-    private Date dateAndTime;
-    @Enumerated(EnumType.STRING)
+    @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime date;
+
     @Column(name = "serviceType")
+    @NotNull
+    @Enumerated(EnumType.STRING)
     private ServiceType serviceType;
 }

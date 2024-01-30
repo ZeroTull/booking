@@ -1,10 +1,10 @@
-package com.pet.booking.controller;
+package com.pet.booking.controller.base;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.pet.booking.controller.ApiDefinition.ADMIN_RESOURCE_ROOT;
+import static com.pet.booking.controller.base.ApiDefinition.ADMIN_RESOURCE_ROOT;
 
 @Slf4j
 @RestController

@@ -3,8 +3,9 @@ package com.pet.booking.models.bookingCalendar;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -14,9 +15,15 @@ public class Day {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @Column
-    private Date date;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime date;
+
     @ElementCollection
-    @CollectionTable(name = "listOfServices")
-    private List<BookingEntry> bookingEntries;
+    @CollectionTable(name = "appointmentsList")
+    private List<Appointment> appointmentsList;
 }
+
+
+//todo - understand if its really needed
