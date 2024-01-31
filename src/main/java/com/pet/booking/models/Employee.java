@@ -16,24 +16,32 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     //private File photo;  //todo - check how to store and how to return via api - separate table for photos
+
     @Column
     @NotNull
     private String firstName;
+
     @Column
     @NotNull
     private String lastName;
-    @ElementCollection
-    @CollectionTable(name = "listOfServices")
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "service_id")
+    @CollectionTable(name = "services_list")
     private List<Service> services;  //todo - validate in db //add validaion onto 'add' entpoint via fromString or smth like that
+
     @Column(unique = true)
     @NotNull
     private String email;
+
     @Column
     @NotNull
     private String password;
+
     @Column
     @NotNull
     private String phoneNumber;
+
     @Column
     boolean isAdmin = false;
 }

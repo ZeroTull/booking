@@ -41,7 +41,7 @@ public class EmployeeController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Employee with %s email already exists.", employee.getEmail()));
         }
         employeeRepo.save(employee);
-        logger.info("Created user with " + employee.getEmail());
+        logger.info("Created employee with " + employee.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -70,6 +70,7 @@ public class EmployeeController {
         updatedEmployee.setAdmin(employee.isAdmin());
 
         employeeRepo.save(updatedEmployee);
+        logger.info("Updated employee with " + employee.getEmail());
     }
 
     @GetMapping(value = "/{id}")

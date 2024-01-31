@@ -62,6 +62,7 @@ public class CustomerController {
         customerToUpdate.setPhoneNumber(employee.getPhoneNumber());
         customerToUpdate.setEmail(employee.getEmail());
         customerRepo.save(customerToUpdate);
+        logger.info(String.format("Updated customer with %s id.", id));
     }
 
     @GetMapping(value = "/{id}")
@@ -70,6 +71,7 @@ public class CustomerController {
         if (customer.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
         }
+        logger.info(String.format("Found customer with %s id.", id));
         return ResponseEntity.ok(mapper.map(customer.get(), CustomerDTO.class)).getBody();
     }
 }
