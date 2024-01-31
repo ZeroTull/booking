@@ -16,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.pet.booking.controller.ApiDefinition.EMPLOYEE_RESOURCE_ROOT;
+import static com.pet.booking.controller.base.ApiDefinition.EMPLOYEE_RESOURCE_ROOT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
