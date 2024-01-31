@@ -1,15 +1,13 @@
 package com.pet.booking.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 @Data
-@Accessors(chain = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomerDTO {
-    private long id;
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
     private String phoneNumber;
 }

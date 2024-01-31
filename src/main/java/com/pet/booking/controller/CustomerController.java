@@ -24,7 +24,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomerController {
     @Autowired
     private CustomerRepo customerRepo;
-    private final ModelMapper mapper = new ModelMapper();
+
+    ModelMapper mapper = new ModelMapper();
+
     Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
@@ -68,7 +70,6 @@ public class CustomerController {
         if (customer.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
         }
-        //todo fix this - returns empty dto, mapping does not work.
-        return ResponseEntity.ok(mapper.map(customer, CustomerDTO.class)).getBody();
+        return ResponseEntity.ok(mapper.map(customer.get(), CustomerDTO.class)).getBody();
     }
 }
