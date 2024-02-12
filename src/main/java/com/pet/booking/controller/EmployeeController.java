@@ -4,6 +4,7 @@ import com.pet.booking.dto.EmployeeDTO;
 import com.pet.booking.models.Employee;
 import com.pet.booking.repo.EmployeeRepo;
 import com.pet.booking.utils.ObjectMapperUtils;
+import com.pet.booking.utils.PartialEmployeeUpdateMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class EmployeeController {
     @Autowired
     private EmployeeRepo employeeRepo;
+    @Autowired
+    private PartialEmployeeUpdateMapper partialEmployeeUpdateMapper;
     Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @GetMapping(value = "/getEmployees")
@@ -33,12 +36,12 @@ public class EmployeeController {
     }
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<HttpStatus> addEmployee(@RequestBody final Employee employee) {
-        //add email constraint validation
+    public ResponseEntity addEmployee(@RequestBody final Employee employee) {
+        //Check if employee with provided email exist.
         if (employeeRepo.findByEmail(employee.getEmail()) != null) {
-            //return 400 with constraint message //
-            // todo message is not displayed in response
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Employee with %s email already exists.", employee.getEmail()));
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(String.format("Employee with %s email already exists.", employee.getEmail()));
         }
         employeeRepo.save(employee);
         logger.info("Created employee with " + employee.getEmail());
@@ -54,30 +57,22 @@ public class EmployeeController {
 
     @PutMapping(value = "/update/{id}")
     public void updateEmployee(@PathVariable long id, @RequestBody Employee employee) {
-        Optional<Employee> findById = employeeRepo.findById(id);
+        Employee employeeById = employeeRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id)));
 
-        if (findById.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
-        }
-        Employee updatedEmployee = findById.get();
+        // Todo add separate service to create/update password
 
-        updatedEmployee.setFirstName(employee.getFirstName());
-        updatedEmployee.setLastName(employee.getLastName());
-        updatedEmployee.setServices(employee.getServices());
-        updatedEmployee.setEmail(employee.getEmail());
-        updatedEmployee.setPassword(employee.getPassword());  // Todo add separate service to create/update password
-        updatedEmployee.setPhoneNumber(employee.getPhoneNumber());
-        updatedEmployee.setAdmin(employee.isAdmin());
+        partialEmployeeUpdateMapper.partialEmployeeUpdate(employeeById, employee.setId(id));
 
-        employeeRepo.save(updatedEmployee);
-        logger.info("Updated employee with " + employee.getEmail());
+        employeeRepo.save(employeeById);
+        logger.info(String.format("Updated employee with %s id.", id));
     }
 
     @GetMapping(value = "/{id}")
     public Employee findById(@PathVariable long id) {
         Optional<Employee> employee = employeeRepo.findById(id);
         if (employee.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Employee with %s id does not exist.", id));
         }
         return ResponseEntity.ok(employee.get()).getBody();
     }

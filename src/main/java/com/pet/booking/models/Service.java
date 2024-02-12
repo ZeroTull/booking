@@ -17,5 +17,4 @@ public class Service {
     private ServiceType serviceType;
 
     private int price;
-
 }

@@ -44,7 +44,6 @@ public class CustomerControllerTest {
 
         // Assuming CustomerDTO is a simple mapping of Customer
         CustomerDTO expectedDto = new CustomerDTO();
-        expectedDto.setId(customerId);
         expectedDto.setEmail(email);
 
         when(customerRepo.findById(customerId)).thenReturn(Optional.of(customer));

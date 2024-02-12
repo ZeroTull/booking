@@ -30,12 +30,12 @@ public class CustomerController {
     Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<HttpStatus> addEmployee(@RequestBody final Customer customer) {
-        //add email constraint validation
+    public ResponseEntity addCustomer(@RequestBody final Customer customer) {
+        //Check if employee with provided email exist.
         if (customerRepo.findByEmail(customer.getEmail()) != null) {
-            //return 400 with constraint message //
-            // todo message is not displayed in response
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Employee with %s email already exists.", customer.getEmail()));
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(String.format("Customer with %s email already exists.", customer.getEmail()));
         }
         customerRepo.save(customer);
         logger.info("Created customer with " + customer.getEmail());
@@ -50,26 +50,29 @@ public class CustomerController {
     }
 
     @PutMapping(value = "/update/{id}", consumes = APPLICATION_JSON_VALUE)
-    public void updateEmployee(@PathVariable long id, @RequestBody Customer employee) {
+    public ResponseEntity updateEmployee(@PathVariable long id, @RequestBody Customer employee) {
         Optional<Customer> findById = customerRepo.findById(id);
 
         if (findById.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(String.format("Employee with %s id does not exists.", id));
         }
         Customer customerToUpdate = findById.get();
         customerToUpdate.setFirstName(employee.getFirstName());
         customerToUpdate.setLastName(employee.getLastName());
         customerToUpdate.setPhoneNumber(employee.getPhoneNumber());
         customerToUpdate.setEmail(employee.getEmail());
-        customerRepo.save(customerToUpdate);
-        logger.info(String.format("Updated customer with %s id.", id));
+
+        logger.info(String.format("Updating customer with %s id.", id));
+        return ResponseEntity.ok(customerRepo.save(customerToUpdate));
     }
 
     @GetMapping(value = "/{id}")
     public CustomerDTO findById(@PathVariable long id) {
         Optional<Customer> customer = customerRepo.findById(id);
         if (customer.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Customer with %s id does not exist.", id));
         }
         logger.info(String.format("Found customer with %s id.", id));
         return ResponseEntity.ok(mapper.map(customer.get(), CustomerDTO.class)).getBody();
