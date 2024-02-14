@@ -31,8 +31,78 @@ public class CustomerControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
+//    @Test
+//    public void createNewCustomer() {
+//        String customerEmail = RandomStringUtils.randomAlphabetic(5).concat("@gmail.com");
+//        Customer expected = new Customer();
+//        expected.setFirstName(RandomStringUtils.randomAlphabetic(5));
+//        expected.setLastName(RandomStringUtils.randomAlphabetic(5));
+//        expected.setEmail(customerEmail);
+//        expected.setPassword(RandomStringUtils.randomAlphanumeric(12));
+//        expected.setPhoneNumber(RandomStringUtils.randomNumeric(9));
+//
+//
+//        customerController.addCustomer(expected);
+//        Customer actual = customerRepo.findByEmail(customerEmail);
+//        expected.setId(actual.getId());
+//
+//        assertEquals(actual, expected);
+//    }
+//
+//    @Test
+//    public void updateCustomer() {
+//        //create customer
+//        String customerEmail = RandomStringUtils.randomAlphabetic(5).concat("@gmail.com");
+//        Customer expected = new Customer();
+//        expected.setFirstName(RandomStringUtils.randomAlphabetic(5));
+//        expected.setLastName(RandomStringUtils.randomAlphabetic(5));
+//        expected.setEmail(customerEmail);
+//        expected.setPassword(RandomStringUtils.randomAlphanumeric(12));
+//        expected.setPhoneNumber(RandomStringUtils.randomNumeric(9));
+//
+//        //validate customer creation
+//        customerController.addCustomer(expected);
+//        Customer actual = customerRepo.findByEmail(customerEmail);
+//        expected.setId(actual.getId());
+//        assertEquals(actual, expected);
+//
+//        //update customer with new values
+//        String updatedEmail = RandomStringUtils.randomAlphabetic(5).concat("@gmail.com");
+//        expected.setFirstName(RandomStringUtils.randomAlphabetic(5));
+//        expected.setLastName(RandomStringUtils.randomAlphabetic(5));
+//        expected.setEmail(updatedEmail);
+//        expected.setPassword(RandomStringUtils.randomAlphanumeric(12));
+//        expected.setPhoneNumber(RandomStringUtils.randomNumeric(9));
+//
+//        //get updated customer
+//        actual = customerRepo.findByEmail(customerEmail);
+//
+//        //validate updated customer
+//        assertEquals(actual, expected);
+//    }
+//
+//    @Test
+//    public void deleteCustomer() {
+//        //create customer
+//        String customerEmail = RandomStringUtils.randomAlphabetic(5).concat("@gmail.com");
+//        Customer expected = new Customer();
+//        expected.setFirstName(RandomStringUtils.randomAlphabetic(5));
+//        expected.setLastName(RandomStringUtils.randomAlphabetic(5));
+//        expected.setEmail(customerEmail);
+//        expected.setPassword(RandomStringUtils.randomAlphanumeric(12));
+//        expected.setPhoneNumber(RandomStringUtils.randomNumeric(9));
+//        expected = customerRepo.findByEmail(customerEmail);
+//
+//        //delete customer
+//        customerController.deleteCustomer(expected.getId());
+//        //find in db
+//        expected = customerRepo.findByEmail(customerEmail);
+//        //validate user deleted
+//        assertNull(expected);
+//    }
+
     @Test
-    public void testFindById_WithValidId_ReturnsCustomerDTO() {
+    public void findExistingUserById() {
         // Arrange
         long customerId = 1L;
         String email = RandomStringUtils.randomAlphabetic(5).concat("@mail.mail");
@@ -56,7 +126,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    public void testFindById_WithInvalidId_ThrowsResponseStatusException() {
+    public void findNotExistingUserById() {
         // Arrange
         long invalidId = 100L;
         when(customerRepo.findById(invalidId)).thenReturn(Optional.empty());
@@ -69,7 +139,7 @@ public class CustomerControllerTest {
         } catch (ResponseStatusException exception) {
             // Assert the properties of the thrown exception
             assertEquals(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
-            assertEquals(exception.getReason(), String.format("User with %s id does not exist.", invalidId));
+            assertEquals(exception.getReason(), String.format("Customer with %s id does not exist.", invalidId));
         }
     }
 }

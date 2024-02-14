@@ -31,7 +31,7 @@ public class CustomerController {
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity addCustomer(@RequestBody final Customer customer) {
-        //Check if employee with provided email exist.
+        //Check if customer with provided email exist.
         if (customerRepo.findByEmail(customer.getEmail()) != null) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -43,26 +43,26 @@ public class CustomerController {
     }
 
     @DeleteMapping(value = "/delete", consumes = APPLICATION_JSON_VALUE)
-    public void addEmployee(@RequestHeader long id) {
-        //add verification if employee exists
+    public void deleteCustomer(@RequestHeader long id) {
+        //add verification if customer exists
         customerRepo.deleteById(id);
         logger.info(String.format("Deleted customer with %s id.", id));
     }
 
     @PutMapping(value = "/update/{id}", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity updateEmployee(@PathVariable long id, @RequestBody Customer employee) {
+    public ResponseEntity Customer(@PathVariable long id, @RequestBody Customer customer) {
         Optional<Customer> findById = customerRepo.findById(id);
 
         if (findById.isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(String.format("Employee with %s id does not exists.", id));
+                    .body(String.format("Customer with %s id does not exists.", id));
         }
         Customer customerToUpdate = findById.get();
-        customerToUpdate.setFirstName(employee.getFirstName());
-        customerToUpdate.setLastName(employee.getLastName());
-        customerToUpdate.setPhoneNumber(employee.getPhoneNumber());
-        customerToUpdate.setEmail(employee.getEmail());
+        customerToUpdate.setFirstName(customer.getFirstName());
+        customerToUpdate.setLastName(customer.getLastName());
+        customerToUpdate.setPhoneNumber(customer.getPhoneNumber());
+        customerToUpdate.setEmail(customer.getEmail());
 
         logger.info(String.format("Updating customer with %s id.", id));
         return ResponseEntity.ok(customerRepo.save(customerToUpdate));
