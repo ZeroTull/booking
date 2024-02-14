@@ -22,7 +22,11 @@ public class Appointment {
 
     @Column
     @NotNull
-    private int customerId;
+    private String customerName;
+
+    @Column
+    @NotNull
+    private String customerEmail;
 
     @Column
     @NotNull
@@ -33,4 +37,6 @@ public class Appointment {
     @NotNull
     @Enumerated(EnumType.STRING)
     private ServiceType serviceType;
+
+    private boolean isActive = true;
 }
