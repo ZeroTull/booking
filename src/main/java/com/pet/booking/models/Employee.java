@@ -28,7 +28,7 @@ public class Employee {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "service_id")
     @CollectionTable(name = "services_list")
-    private List<Service> services;  //todo - validate in db //add validaion onto 'add' entpoint via fromString or smth like that
+    private List<Service> services;  //todo - validate in db //add validation onto 'add' endpoint via fromString or smth like that
 
     @Column(unique = true)
     @NotNull
