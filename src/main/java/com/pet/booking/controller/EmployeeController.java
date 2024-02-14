@@ -4,7 +4,6 @@ import com.pet.booking.dto.EmployeeDTO;
 import com.pet.booking.models.Employee;
 import com.pet.booking.repo.EmployeeRepo;
 import com.pet.booking.utils.ObjectMapperUtils;
-import com.pet.booking.utils.PartialEmployeeUpdateMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +25,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class EmployeeController {
     @Autowired
     private EmployeeRepo employeeRepo;
-    @Autowired
-    private PartialEmployeeUpdateMapper partialEmployeeUpdateMapper;
     Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @GetMapping(value = "/getEmployees")
@@ -61,10 +58,7 @@ public class EmployeeController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id)));
 
         // Todo add separate service to create/update password
-
-        partialEmployeeUpdateMapper.partialEmployeeUpdate(employeeById, employee.setId(id));
-
-        employeeRepo.save(employeeById);
+        employeeRepo.save(employee.setId(id));
         logger.info(String.format("Updated employee with %s id.", id));
     }
 
