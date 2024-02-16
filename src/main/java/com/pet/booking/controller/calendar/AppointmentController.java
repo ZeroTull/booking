@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 import static com.pet.booking.controller.base.ApiDefinition.APPOINTMENT_RESOURCE_ROOT;
 
 @Slf4j
@@ -41,8 +43,12 @@ public class AppointmentController {
 
     @PostMapping(path = "/addAppointment", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity addAppointment(@RequestBody final Appointment appointment) {
+        Appointment appointmentByEmployeeIdAndDate = appointmentRepo.findAppointmentByEmployeeIdAndDate(appointment.getEmployeeId(), appointment.getDate());
 
-        if (appointmentRepo.findAllByEmployeeIdAndDate(appointment.getEmployeeId(), appointment.getDate()) != null) {
+        if (appointment.getDate().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Cannot create appointment in the past.");
+        } else if (appointmentByEmployeeIdAndDate != null) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Appointment for this date already exists.");
@@ -51,6 +57,7 @@ public class AppointmentController {
         logger.info("Created appointment for " + appointment.getDate());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
 
     @DeleteMapping(path = "/{appointmentId}")
     public ResponseEntity deleteAppointment(long appointmentId) {
