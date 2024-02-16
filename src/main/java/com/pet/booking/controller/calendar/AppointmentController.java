@@ -3,6 +3,7 @@ package com.pet.booking.controller.calendar;
 import com.pet.booking.controller.CustomerController;
 import com.pet.booking.models.bookingCalendar.Appointment;
 import com.pet.booking.repo.AppointmentRepo;
+import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,11 @@ public class AppointmentController {
     @GetMapping(path = "/getEmployeeAppointments/{employeeId}")
     public Iterable<Appointment> getAppointmentsByEmployee(@PathVariable int employeeId) {
         return ResponseEntity.ok(appointmentRepo.findAllByEmployeeId(employeeId)).getBody();
+    }
+
+    @GetMapping(path = "/getEmployeeAppointments")
+    public Iterable<Appointment> getAppointmentsByCustomerEmail(@PathParam(value = "email") String email) {
+        return ResponseEntity.ok(appointmentRepo.findAllByCustomerEmail(email)).getBody();
     }
 
     @PostMapping(path = "/addAppointment", consumes = MediaType.APPLICATION_JSON_VALUE)
