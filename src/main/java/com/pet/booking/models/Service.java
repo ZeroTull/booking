@@ -1,8 +1,9 @@
 package com.pet.booking.models;
 
-import com.pet.booking.enums.ServiceType;
+import com.pet.booking.enums.ServiceTypeName;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.antlr.v4.runtime.misc.NotNull;
 
 @Data
 @Entity
@@ -13,8 +14,14 @@ public class Service {
     private long service_id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "serviceType")
-    private ServiceType serviceType;
+    @Column(name = "serviceTypeName")
+    private ServiceTypeName serviceTypeName;
 
+    @Column
+    @NotNull
     private int price;
+
+    @Column
+    @NotNull
+    private int durationInMinutes;
 }
