@@ -1,6 +1,6 @@
 package com.pet.booking.models.bookingCalendar;
 
-import com.pet.booking.enums.ServiceType;
+import com.pet.booking.enums.ServiceTypeName;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -35,8 +35,7 @@ public class Appointment {
 
     @Column(name = "serviceType")
     @NotNull
-    @Enumerated(EnumType.STRING)
-    private ServiceType serviceType;
+    private ServiceTypeName serviceType;
 
     private boolean isActive = true;
 }

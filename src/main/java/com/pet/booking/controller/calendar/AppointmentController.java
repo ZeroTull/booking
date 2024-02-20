@@ -3,6 +3,7 @@ package com.pet.booking.controller.calendar;
 import com.pet.booking.controller.CustomerController;
 import com.pet.booking.models.bookingCalendar.Appointment;
 import com.pet.booking.repo.AppointmentRepo;
+import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 import static com.pet.booking.controller.base.ApiDefinition.APPOINTMENT_RESOURCE_ROOT;
 
@@ -33,10 +36,19 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentRepo.findAllByEmployeeId(employeeId)).getBody();
     }
 
+    @GetMapping(path = "/getEmployeeAppointments")
+    public Iterable<Appointment> getAppointmentsByCustomerEmail(@PathParam(value = "email") String email) {
+        return ResponseEntity.ok(appointmentRepo.findAllByCustomerEmail(email)).getBody();
+    }
+
     @PostMapping(path = "/addAppointment", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity addAppointment(@RequestBody final Appointment appointment) {
+        Appointment appointmentByEmployeeIdAndDate = appointmentRepo.findAppointmentByEmployeeIdAndDate(appointment.getEmployeeId(), appointment.getDate());
 
-        if (appointmentRepo.findAllByEmployeeIdAndDate(appointment.getEmployeeId(), appointment.getDate()) != null) {
+        if (appointment.getDate().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Cannot create appointment in the past.");
+        } else if (appointmentByEmployeeIdAndDate != null) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Appointment for this date already exists.");
@@ -45,6 +57,7 @@ public class AppointmentController {
         logger.info("Created appointment for " + appointment.getDate());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
 
     @DeleteMapping(path = "/{appointmentId}")
     public ResponseEntity deleteAppointment(long appointmentId) {
