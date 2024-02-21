@@ -10,7 +10,9 @@ public interface AppointmentRepo extends CrudRepository<Appointment, Long> {
     List<Appointment> findAllByEmployeeId(long employeeId);
     List<Appointment> findAllByCustomerEmail(String customerEmail);
 
-    Appointment findAppointmentByEmployeeIdAndDate(long employeeId, LocalDateTime date);
+    Appointment findAppointmentByEmployeeIdAndDateTime(long employeeId, LocalDateTime date);
+
+    List<Appointment> findAppointmentsByEmployeeId(long employeeId);
     void deleteById(long appointmentId);
     Appointment findById(long appointmentId);
 }
