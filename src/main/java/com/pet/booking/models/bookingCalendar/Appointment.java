@@ -10,10 +10,11 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "appointment")
+@Table(name = "APPOINTMENT")
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "APPOINTMENT_ID")
     private long id;
 
     @Column

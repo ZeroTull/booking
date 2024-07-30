@@ -43,7 +43,7 @@ public class AppointmentController {
     }
 
     @PostMapping(path = "/addAppointment", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity addAppointment(@RequestBody final Appointment appointment) {
+    public ResponseEntity<String> addAppointment(@RequestBody final Appointment appointment) {
         //check that new appointment is not in the range of already existing appointments of employee.
         List<Appointment> appointmentList = appointmentRepo.findAppointmentsByEmployeeId(appointment.getEmployeeId());
 
@@ -56,8 +56,7 @@ public class AppointmentController {
             }
         }
 
-
-        //TODO check if this validtion is needed now
+        //TODO check if this validation is needed now
         Appointment appointmentByEmployeeIdAndDate = appointmentRepo.findAppointmentByEmployeeIdAndDateTime(appointment.getEmployeeId(), appointment.getDateTime());
         if (appointment.getDateTime().isBefore(LocalDateTime.now())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -67,14 +66,17 @@ public class AppointmentController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Appointment for this date already exists.");
         }
+
         appointmentRepo.save(appointment);
         logger.info("Created appointment for " + appointment.getDateTime());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Created appointment for " + appointment.getDateTime());
     }
 
 
     @DeleteMapping(path = "/{appointmentId}")
-    public ResponseEntity deleteAppointment(long appointmentId) {
+    public ResponseEntity<String> deleteAppointment(long appointmentId) {
         if (appointmentRepo.findById(appointmentId) != null) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -82,9 +84,8 @@ public class AppointmentController {
         }
 
         appointmentRepo.deleteById(appointmentId);
-        logger.info("Appointment with %s deleted." + appointmentId);
+        logger.info("Appointment #%s deleted." + appointmentId);
         return ResponseEntity.status(HttpStatus.OK).build();
-
     }
 }
 
