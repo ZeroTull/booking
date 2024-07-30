@@ -1,7 +1,8 @@
 # Stage 1: Build the application
-FROM maven AS build
+FROM maven:3.9.8 AS build
 WORKDIR /app
 COPY * /app
+RUN mvn dependency:go-offline
 RUN mvn package -DskipTests
 
 
