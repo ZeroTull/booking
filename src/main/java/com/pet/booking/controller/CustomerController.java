@@ -29,12 +29,12 @@ public class CustomerController {
     Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity addCustomer(@RequestBody final Customer customer) {
+    public ResponseEntity<HttpStatus> addCustomer(@RequestBody final Customer customer) {
         //Check if customer with provided email exist.
         if (customerRepo.findByEmail(customer.getEmail()) != null) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(String.format("Customer with %s email already exists.", customer.getEmail()));
+                    .body(HttpStatus.valueOf(String.format("Customer with %s email already exists.", customer.getEmail())));
         }
         customerRepo.save(customer);
         logger.info("Created customer with " + customer.getEmail());
@@ -49,7 +49,7 @@ public class CustomerController {
     }
 
     @PutMapping(value = "/update/{id}", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity Customer(@PathVariable long id, @RequestBody Customer customer) {
+    public ResponseEntity updateEmployee(@PathVariable long id, @RequestBody Customer customer) {
         Optional<Customer> findById = customerRepo.findById(id);
 
         if (findById.isEmpty()) {
@@ -57,6 +57,7 @@ public class CustomerController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(String.format("Customer with %s id does not exists.", id));
         }
+
         Customer customerToUpdate = findById.get();
         customerToUpdate.setFirstName(customer.getFirstName());
         customerToUpdate.setLastName(customer.getLastName());
