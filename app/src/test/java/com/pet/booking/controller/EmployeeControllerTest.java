@@ -1,7 +1,9 @@
 package com.pet.booking.controller;
 
 import com.pet.booking.dto.EmployeeDTO;
+import com.pet.booking.enums.ServiceTypeName;
 import com.pet.booking.models.Employee;
+import com.pet.booking.models.Service;
 import com.pet.booking.repo.EmployeeRepo;
 import io.unified.verify.hard.Verify;
 import io.unified.verify.soft.Verifier;
@@ -15,6 +17,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
@@ -72,21 +75,35 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    public void updateEmployeePatchesFieldsWithoutClearingPasswordOrAdmin() {
+    public void updateEmployeeAppliesAllFieldsButNeverPasswordOrAdmin() {
         long employeeId = 1L;
+        Service originalService = new Service();
+        originalService.setServiceTypeName(ServiceTypeName.TYPE_1);
+
         Employee existing = new Employee();
         existing.setId(employeeId);
         existing.setFirstName("Old");
+        existing.setLastName("OldLast");
+        existing.setPhoneNumber("555-0000");
         existing.setEmail("old@mail.mail");
+        existing.setServices(List.of(originalService));
         existing.setPassword("existing-hash");
         existing.setAdmin(true);
 
-        // Simulates a client that only sends the fields it's actually changing --
-        // updateEmployee used to overwrite the whole entity with this, nulling out
-        // password/isAdmin/anything else omitted.
+        Service newService = new Service();
+        newService.setServiceTypeName(ServiceTypeName.TYPE_2);
+
+        // A request that changes every regular field, and also (whether maliciously or by a
+        // careless client sending the whole entity back) tries to smuggle in a different
+        // password and a demoted admin flag -- neither should reach the saved entity.
         Employee update = new Employee();
         update.setFirstName("New");
+        update.setLastName("NewLast");
+        update.setPhoneNumber("555-1111");
         update.setEmail("new@mail.mail");
+        update.setServices(List.of(newService));
+        update.setPassword("attacker-supplied");
+        update.setAdmin(false);
 
         when(employeeRepo.findById(employeeId)).thenReturn(Optional.of(existing));
 
@@ -97,8 +114,13 @@ public class EmployeeControllerTest {
         Employee saved = savedCaptor.getValue();
 
         Verifier verifier = new Verifier();
+        // Regular fields: all take the new request values.
         verifier.String.equals(saved.getFirstName(), "New");
+        verifier.String.equals(saved.getLastName(), "NewLast");
+        verifier.String.equals(saved.getPhoneNumber(), "555-1111");
         verifier.String.equals(saved.getEmail(), "new@mail.mail");
+        verifier.Object.equals(saved.getServices(), List.of(newService));
+        // Sensitive fields: keep their original values no matter what the request contains.
         verifier.String.equals(saved.getPassword(), "existing-hash");
         verifier.Bool.isTrue(saved.isAdmin());
         verifier.verify();
