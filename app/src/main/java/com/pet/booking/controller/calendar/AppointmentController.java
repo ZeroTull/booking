@@ -1,12 +1,9 @@
 package com.pet.booking.controller.calendar;
 
-import com.pet.booking.controller.CustomerController;
 import com.pet.booking.models.bookingCalendar.Appointment;
 import com.pet.booking.repo.AppointmentRepo;
 import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +22,6 @@ public class AppointmentController {
 
     @Autowired
     AppointmentRepo appointmentRepo;
-    Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
     @GetMapping(path = "/getAllAppointment")
     public Iterable<Appointment> getAllAppointments() {
@@ -72,7 +68,7 @@ public class AppointmentController {
         }
 
         appointmentRepo.save(appointment);
-        logger.info("Created appointment for " + appointment.getDateTime());
+        log.info("Created appointment for " + appointment.getDateTime());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("Created appointment for " + appointment.getDateTime());
@@ -88,7 +84,7 @@ public class AppointmentController {
         }
 
         appointmentRepo.deleteById(appointmentId);
-        logger.info(String.format("Appointment #%s deleted.", appointmentId));
+        log.info(String.format("Appointment #%s deleted.", appointmentId));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
