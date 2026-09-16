@@ -1,5 +1,6 @@
 package com.pet.booking.controller.calendar;
 
+import com.pet.booking.dto.AppointmentDTO;
 import com.pet.booking.enums.ServiceTypeName;
 import com.pet.booking.models.Customer;
 import com.pet.booking.models.Employee;
@@ -7,6 +8,7 @@ import com.pet.booking.models.Service;
 import com.pet.booking.models.bookingCalendar.Appointment;
 import com.pet.booking.repo.AppointmentRepo;
 import io.unified.verify.hard.Verify;
+import io.unified.verify.soft.Verifier;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -160,5 +162,36 @@ public class AppointmentControllerTest {
         Verify.Object.equals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
         Verify.String.equals(response.getBody(), "Appointment with this id does not exist.");
         verify(appointmentRepo, never()).deleteById(appointmentId);
+    }
+
+    @Test
+    public void getAllAppointmentsMapsToDtosWithoutLeakingEmployeePassword() {
+        Employee employeeEntity = employee(1L);
+        employeeEntity.setFirstName("Jane");
+        employeeEntity.setPassword("super-secret");
+
+        Customer customerEntity = customer(2L);
+        customerEntity.setFirstName("John");
+
+        Appointment appointment = new Appointment();
+        appointment.setId(9L);
+        appointment.setEmployee(employeeEntity);
+        appointment.setCustomer(customerEntity);
+        appointment.setDateTime(LocalDateTime.now().plusDays(1));
+        appointment.setService(service(30));
+
+        when(appointmentRepo.findAll()).thenReturn(List.of(appointment));
+
+        List<AppointmentDTO> result = appointmentController.getAllAppointments();
+
+        Verifier verifier = new Verifier();
+        verifier.Int.equals(result.size(), 1);
+        AppointmentDTO dto = result.get(0);
+        verifier.Long.equals(dto.getId(), 9L);
+        verifier.String.equals(dto.getEmployee().getFirstName(), "Jane");
+        verifier.String.equals(dto.getCustomer().getFirstName(), "John");
+        // EmployeeDTO has no password field at all -- structurally impossible to leak it here,
+        // same guarantee as EmployeeController.findById's fix.
+        verifier.verify();
     }
 }

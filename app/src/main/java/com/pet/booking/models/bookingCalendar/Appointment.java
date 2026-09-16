@@ -32,7 +32,13 @@ public class Appointment {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateTime;
     //TODO - update to use existing in db services, by Id. Create such services via Liquibase
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // EAGER (not the original LAZY): AppointmentDTO carries this field through as the same
+    // Service type rather than mapping it into its own DTO (it has no sensitive fields to
+    // strip), so a LAZY, un-initialized Hibernate proxy would pass straight through to
+    // Jackson and fail to serialize -- confirmed live: InvalidDefinitionException, "No
+    // serializer found for class ...ByteBuddyInterceptor". Service is tiny (3 scalar
+    // fields), so always fetching it is cheap.
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Service service;
     @Column
     private boolean isActive = true;

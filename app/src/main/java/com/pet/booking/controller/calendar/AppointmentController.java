@@ -1,7 +1,9 @@
 package com.pet.booking.controller.calendar;
 
+import com.pet.booking.dto.AppointmentDTO;
 import com.pet.booking.models.bookingCalendar.Appointment;
 import com.pet.booking.repo.AppointmentRepo;
+import com.pet.booking.utils.ObjectMapperUtils;
 import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.pet.booking.controller.base.ApiDefinition.APPOINTMENT_RESOURCE_ROOT;
 
@@ -24,18 +28,20 @@ public class AppointmentController {
     AppointmentRepo appointmentRepo;
 
     @GetMapping(path = "/getAllAppointment")
-    public Iterable<Appointment> getAllAppointments() {
-        return appointmentRepo.findAll();
+    public List<AppointmentDTO> getAllAppointments() {
+        List<Appointment> all = StreamSupport.stream(appointmentRepo.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+        return ObjectMapperUtils.mapAll(all, AppointmentDTO.class);
     }
 
     @GetMapping(path = "/getEmployeeAppointments/{employeeId}")
-    public Iterable<Appointment> getAppointmentsByEmployee(@PathVariable int employeeId) {
-        return ResponseEntity.ok(appointmentRepo.findAllByEmployee_Id(employeeId)).getBody();
+    public List<AppointmentDTO> getAppointmentsByEmployee(@PathVariable int employeeId) {
+        return ObjectMapperUtils.mapAll(appointmentRepo.findAllByEmployee_Id(employeeId), AppointmentDTO.class);
     }
 
     @GetMapping(path = "/getEmployeeAppointments")
-    public Iterable<Appointment> getAppointmentsByCustomerEmail(@PathParam(value = "email") String email) {
-        return ResponseEntity.ok(appointmentRepo.findAllByCustomer_Email(email)).getBody();
+    public List<AppointmentDTO> getAppointmentsByCustomerEmail(@PathParam(value = "email") String email) {
+        return ObjectMapperUtils.mapAll(appointmentRepo.findAllByCustomer_Email(email), AppointmentDTO.class);
     }
 
     @PostMapping(path = "/addAppointment", consumes = MediaType.APPLICATION_JSON_VALUE)
