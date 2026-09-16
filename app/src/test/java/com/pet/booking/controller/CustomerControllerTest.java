@@ -9,8 +9,10 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -18,12 +20,17 @@ import org.testng.annotations.Test;
 
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class CustomerControllerTest {
 
     @Mock
     private CustomerRepo customerRepo;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private CustomerController customerController;
@@ -167,5 +174,23 @@ public class CustomerControllerTest {
         verifier.Object.equals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
         verifier.String.equals(response.getBody(), String.format("Customer with %s email already exists.", email));
         verifier.verify();
+    }
+
+    @Test
+    public void addCustomerHashesThePasswordBeforeSaving() {
+        String email = RandomStringUtils.randomAlphabetic(5).concat("@mail.mail");
+        Customer customer = new Customer();
+        customer.setEmail(email);
+        customer.setPassword("plaintext-password");
+
+        when(customerRepo.findByEmail(email)).thenReturn(null);
+        when(passwordEncoder.encode("plaintext-password")).thenReturn("bcrypt-hash");
+
+        customerController.addCustomer(customer);
+
+        ArgumentCaptor<Customer> savedCaptor = ArgumentCaptor.forClass(Customer.class);
+        verify(customerRepo).save(savedCaptor.capture());
+        Verify.String.equals(savedCaptor.getValue().getPassword(), "bcrypt-hash");
+        verify(passwordEncoder).encode(eq("plaintext-password"));
     }
 }

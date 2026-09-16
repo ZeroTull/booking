@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -20,6 +21,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +29,9 @@ public class EmployeeControllerTest {
 
     @Mock
     private EmployeeRepo employeeRepo;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private EmployeeController employeeController;
@@ -124,5 +129,22 @@ public class EmployeeControllerTest {
         verifier.String.equals(saved.getPassword(), "existing-hash");
         verifier.Bool.isTrue(saved.isAdmin());
         verifier.verify();
+    }
+
+    @Test
+    public void addEmployeeHashesThePasswordBeforeSaving() {
+        Employee employee = new Employee();
+        employee.setEmail("new.hire@mail.mail");
+        employee.setPassword("plaintext-password");
+
+        when(employeeRepo.findByEmail("new.hire@mail.mail")).thenReturn(null);
+        when(passwordEncoder.encode("plaintext-password")).thenReturn("bcrypt-hash");
+
+        employeeController.addEmployee(employee);
+
+        ArgumentCaptor<Employee> savedCaptor = ArgumentCaptor.forClass(Employee.class);
+        verify(employeeRepo).save(savedCaptor.capture());
+        Verify.String.equals(savedCaptor.getValue().getPassword(), "bcrypt-hash");
+        verify(passwordEncoder).encode(eq("plaintext-password"));
     }
 }
