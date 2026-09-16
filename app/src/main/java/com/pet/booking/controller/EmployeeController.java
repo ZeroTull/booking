@@ -54,11 +54,19 @@ public class EmployeeController {
 
     @PutMapping(value = "/update/{id}")
     public void updateEmployee(@PathVariable long id, @RequestBody Employee employee) {
-        Employee employeeById = employeeRepo.findById(id)
+        Employee employeeToUpdate = employeeRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("User with %s id does not exist.", id)));
 
-        // Todo add separate service to create/update password
-        employeeRepo.save(employee.setId(id));
+        // Deliberately not copying password/isAdmin here: this endpoint has no auth
+        // enforcement, so those stay out of the general-purpose field update on purpose,
+        // not just because of the pre-existing "separate service for password" TODO.
+        employeeToUpdate.setFirstName(employee.getFirstName());
+        employeeToUpdate.setLastName(employee.getLastName());
+        employeeToUpdate.setPhoneNumber(employee.getPhoneNumber());
+        employeeToUpdate.setEmail(employee.getEmail());
+        employeeToUpdate.setServices(employee.getServices());
+
+        employeeRepo.save(employeeToUpdate);
         logger.info(String.format("Updated employee with %s id.", id));
     }
 

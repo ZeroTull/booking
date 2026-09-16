@@ -49,7 +49,7 @@ public class CustomerController {
     }
 
     @PutMapping(value = "/update/{id}", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity updateEmployee(@PathVariable long id, @RequestBody Customer customer) {
+    public ResponseEntity updateCustomer(@PathVariable long id, @RequestBody Customer customer) {
         Optional<Customer> findById = customerRepo.findById(id);
 
         if (findById.isEmpty()) {

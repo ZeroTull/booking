@@ -5,6 +5,7 @@ import com.pet.booking.models.Employee;
 import com.pet.booking.repo.EmployeeRepo;
 import io.unified.verify.hard.Verify;
 import io.unified.verify.soft.Verifier;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -16,6 +17,7 @@ import org.testng.annotations.Test;
 
 import java.util.Optional;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class EmployeeControllerTest {
@@ -67,5 +69,38 @@ public class EmployeeControllerTest {
                 () -> employeeController.findById(invalidId));
 
         Verify.Object.equals(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void updateEmployeePatchesFieldsWithoutClearingPasswordOrAdmin() {
+        long employeeId = 1L;
+        Employee existing = new Employee();
+        existing.setId(employeeId);
+        existing.setFirstName("Old");
+        existing.setEmail("old@mail.mail");
+        existing.setPassword("existing-hash");
+        existing.setAdmin(true);
+
+        // Simulates a client that only sends the fields it's actually changing --
+        // updateEmployee used to overwrite the whole entity with this, nulling out
+        // password/isAdmin/anything else omitted.
+        Employee update = new Employee();
+        update.setFirstName("New");
+        update.setEmail("new@mail.mail");
+
+        when(employeeRepo.findById(employeeId)).thenReturn(Optional.of(existing));
+
+        employeeController.updateEmployee(employeeId, update);
+
+        ArgumentCaptor<Employee> savedCaptor = ArgumentCaptor.forClass(Employee.class);
+        verify(employeeRepo).save(savedCaptor.capture());
+        Employee saved = savedCaptor.getValue();
+
+        Verifier verifier = new Verifier();
+        verifier.String.equals(saved.getFirstName(), "New");
+        verifier.String.equals(saved.getEmail(), "new@mail.mail");
+        verifier.String.equals(saved.getPassword(), "existing-hash");
+        verifier.Bool.isTrue(saved.isAdmin());
+        verifier.verify();
     }
 }
