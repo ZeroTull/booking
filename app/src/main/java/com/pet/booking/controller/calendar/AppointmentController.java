@@ -1,7 +1,7 @@
 package com.pet.booking.controller.calendar;
 
 import com.pet.booking.dto.AppointmentDTO;
-import com.pet.booking.models.bookingCalendar.Appointment;
+import com.pet.booking.models.calendar.Appointment;
 import com.pet.booking.repo.AppointmentRepo;
 import com.pet.booking.utils.ObjectMapperUtils;
 import jakarta.websocket.server.PathParam;

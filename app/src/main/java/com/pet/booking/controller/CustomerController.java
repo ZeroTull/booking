@@ -3,8 +3,8 @@ package com.pet.booking.controller;
 import com.pet.booking.dto.CustomerDTO;
 import com.pet.booking.models.Customer;
 import com.pet.booking.repo.CustomerRepo;
+import com.pet.booking.utils.ObjectMapperUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,6 @@ public class CustomerController {
     private CustomerRepo customerRepo;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    ModelMapper mapper = new ModelMapper();
 
     Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
@@ -79,6 +78,6 @@ public class CustomerController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Customer with %s id does not exist.", id));
         }
         logger.info(String.format("Found customer with %s id.", id));
-        return ResponseEntity.ok(mapper.map(customer.get(), CustomerDTO.class)).getBody();
+        return ObjectMapperUtils.map(customer.get(), CustomerDTO.class);
     }
 }

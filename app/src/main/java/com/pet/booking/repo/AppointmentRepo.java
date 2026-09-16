@@ -1,6 +1,6 @@
 package com.pet.booking.repo;
 
-import com.pet.booking.models.bookingCalendar.Appointment;
+import com.pet.booking.models.calendar.Appointment;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

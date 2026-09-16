@@ -5,7 +5,7 @@ import com.pet.booking.enums.ServiceTypeName;
 import com.pet.booking.models.Customer;
 import com.pet.booking.models.Employee;
 import com.pet.booking.models.Service;
-import com.pet.booking.models.bookingCalendar.Appointment;
+import com.pet.booking.models.calendar.Appointment;
 import com.pet.booking.repo.AppointmentRepo;
 import io.unified.verify.hard.Verify;
 import io.unified.verify.soft.Verifier;
