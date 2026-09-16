@@ -25,9 +25,14 @@ public class GlobalExceptionHandler {
         }
     }
 
-    @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<JsonResponse> handleResponseStatusExceptionException(ResponseStatusException e) {
-        return new ResponseEntity<>(new JsonResponse(e.getReason()),
-                HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<JsonResponse> handleResponseStatusException(ResponseStatusException e) {
+        return ResponseEntity.status(e.getStatusCode()).body(new JsonResponse(e.getReason()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<JsonResponse> handleUnexpectedException(Exception e) {
+        return new ResponseEntity<>(new JsonResponse("An unexpected error occurred."),
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
