@@ -16,6 +16,8 @@ import org.testng.annotations.Test;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class AppointmentControllerTest {
@@ -98,5 +100,28 @@ public class AppointmentControllerTest {
 
         Verify.Object.equals(response.getStatusCode(), HttpStatus.CREATED);
         Verify.String.contains(response.getBody(), "Created appointment for");
+    }
+
+    @Test
+    public void deletesAppointmentThatExists() {
+        long appointmentId = 5L;
+        when(appointmentRepo.findById(appointmentId)).thenReturn(appointment(1, LocalDateTime.now().plusDays(1), service(30)));
+
+        ResponseEntity<String> response = appointmentController.deleteAppointment(appointmentId);
+
+        Verify.Object.equals(response.getStatusCode(), HttpStatus.OK);
+        verify(appointmentRepo).deleteById(appointmentId);
+    }
+
+    @Test
+    public void rejectsDeleteOfAppointmentThatDoesNotExist() {
+        long appointmentId = 5L;
+        when(appointmentRepo.findById(appointmentId)).thenReturn(null);
+
+        ResponseEntity<String> response = appointmentController.deleteAppointment(appointmentId);
+
+        Verify.Object.equals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        Verify.String.equals(response.getBody(), "Appointment with this id does not exist.");
+        verify(appointmentRepo, never()).deleteById(appointmentId);
     }
 }
