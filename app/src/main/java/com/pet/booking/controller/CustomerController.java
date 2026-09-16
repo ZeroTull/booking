@@ -29,12 +29,12 @@ public class CustomerController {
     Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
     @PostMapping(value = "/add", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<HttpStatus> addCustomer(@RequestBody final Customer customer) {
+    public ResponseEntity<String> addCustomer(@RequestBody final Customer customer) {
         //Check if customer with provided email exist.
         if (customerRepo.findByEmail(customer.getEmail()) != null) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(HttpStatus.valueOf(String.format("Customer with %s email already exists.", customer.getEmail())));
+                    .body(String.format("Customer with %s email already exists.", customer.getEmail()));
         }
         customerRepo.save(customer);
         logger.info("Created customer with " + customer.getEmail());
