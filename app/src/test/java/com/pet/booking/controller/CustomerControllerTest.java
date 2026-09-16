@@ -3,6 +3,8 @@ package com.pet.booking.controller;
 import com.pet.booking.dto.CustomerDTO;
 import com.pet.booking.models.Customer;
 import com.pet.booking.repo.CustomerRepo;
+import io.unified.verify.hard.Verify;
+import io.unified.verify.soft.Verifier;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,7 +18,6 @@ import org.testng.annotations.Test;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
 
 public class CustomerControllerTest {
 
@@ -122,7 +123,7 @@ public class CustomerControllerTest {
         CustomerDTO actualDto = customerController.findById(customerId);
 
         // Assert
-        assertEquals(actualDto.getEmail(), expectedDto.getEmail());
+        Verify.String.equals(actualDto.getEmail(), expectedDto.getEmail());
     }
 
     @Test
@@ -137,9 +138,12 @@ public class CustomerControllerTest {
             // If no exception is thrown, fail the test
             Assert.fail("Expected ResponseStatusException was not thrown");
         } catch (ResponseStatusException exception) {
-            // Assert the properties of the thrown exception
-            assertEquals(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
-            assertEquals(exception.getReason(), String.format("Customer with %s id does not exist.", invalidId));
+            // Assert both properties of the thrown exception together, so a mismatch on
+            // either one is reported in a single run instead of masking the other.
+            Verifier verifier = new Verifier();
+            verifier.Object.equals(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
+            verifier.String.equals(exception.getReason(), String.format("Customer with %s id does not exist.", invalidId));
+            verifier.verify();
         }
     }
 }
