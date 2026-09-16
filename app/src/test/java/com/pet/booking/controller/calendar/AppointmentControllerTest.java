@@ -79,6 +79,7 @@ public class AppointmentControllerTest {
         ResponseEntity<String> response = appointmentController.addAppointment(adjacent);
 
         Verify.Object.equals(response.getStatusCode(), HttpStatus.CREATED);
+        Verify.String.contains(response.getBody(), "Created appointment for");
     }
 
     @Test
@@ -96,5 +97,6 @@ public class AppointmentControllerTest {
         ResponseEntity<String> response = appointmentController.addAppointment(before);
 
         Verify.Object.equals(response.getStatusCode(), HttpStatus.CREATED);
+        Verify.String.contains(response.getBody(), "Created appointment for");
     }
 }
