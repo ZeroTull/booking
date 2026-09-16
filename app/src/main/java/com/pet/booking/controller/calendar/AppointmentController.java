@@ -30,18 +30,25 @@ public class AppointmentController {
 
     @GetMapping(path = "/getEmployeeAppointments/{employeeId}")
     public Iterable<Appointment> getAppointmentsByEmployee(@PathVariable int employeeId) {
-        return ResponseEntity.ok(appointmentRepo.findAllByEmployeeId(employeeId)).getBody();
+        return ResponseEntity.ok(appointmentRepo.findAllByEmployee_Id(employeeId)).getBody();
     }
 
     @GetMapping(path = "/getEmployeeAppointments")
     public Iterable<Appointment> getAppointmentsByCustomerEmail(@PathParam(value = "email") String email) {
-        return ResponseEntity.ok(appointmentRepo.findAllByCustomerEmail(email)).getBody();
+        return ResponseEntity.ok(appointmentRepo.findAllByCustomer_Email(email)).getBody();
     }
 
     @PostMapping(path = "/addAppointment", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> addAppointment(@RequestBody final Appointment appointment) {
+        if (appointment.getEmployee() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Employee is required.");
+        }
+        if (appointment.getCustomer() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Customer is required.");
+        }
+
         //check that new appointment is not in the range of already existing appointments of employee.
-        List<Appointment> appointmentList = appointmentRepo.findAppointmentsByEmployeeId(appointment.getEmployeeId());
+        List<Appointment> appointmentList = appointmentRepo.findAppointmentsByEmployee_Id(appointment.getEmployee().getId());
 
         LocalDateTime newStart = appointment.getDateTime();
         LocalDateTime newEnd = newStart.plusMinutes(appointment.getService().getDurationInMinutes());
@@ -57,7 +64,7 @@ public class AppointmentController {
         }
 
         //TODO check if this validation is needed now
-        Appointment appointmentByEmployeeIdAndDate = appointmentRepo.findAppointmentByEmployeeIdAndDateTime(appointment.getEmployeeId(), appointment.getDateTime());
+        Appointment appointmentByEmployeeIdAndDate = appointmentRepo.findAppointmentByEmployee_IdAndDateTime(appointment.getEmployee().getId(), appointment.getDateTime());
         if (appointment.getDateTime().isBefore(LocalDateTime.now())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Cannot create appointment in the past.");

@@ -1,6 +1,8 @@
 package com.pet.booking.controller.calendar;
 
 import com.pet.booking.enums.ServiceTypeName;
+import com.pet.booking.models.Customer;
+import com.pet.booking.models.Employee;
 import com.pet.booking.models.Service;
 import com.pet.booking.models.bookingCalendar.Appointment;
 import com.pet.booking.repo.AppointmentRepo;
@@ -41,9 +43,22 @@ public class AppointmentControllerTest {
         return service;
     }
 
-    private static Appointment appointment(int employeeId, LocalDateTime dateTime, Service service) {
+    private static Employee employee(long id) {
+        Employee employee = new Employee();
+        employee.setId(id);
+        return employee;
+    }
+
+    private static Customer customer(long id) {
+        Customer customer = new Customer();
+        customer.setId(id);
+        return customer;
+    }
+
+    private static Appointment appointment(long employeeId, LocalDateTime dateTime, Service service) {
         Appointment appointment = new Appointment();
-        appointment.setEmployeeId(employeeId);
+        appointment.setEmployee(employee(employeeId));
+        appointment.setCustomer(customer(1L));
         appointment.setDateTime(dateTime);
         appointment.setService(service);
         return appointment;
@@ -51,14 +66,14 @@ public class AppointmentControllerTest {
 
     @Test
     public void rejectsAppointmentThatOverlapsExisting() {
-        int employeeId = 1;
+        long employeeId = 1L;
         LocalDateTime existingStart = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0);
         Appointment existing = appointment(employeeId, existingStart, service(60));
 
         // starts 30 minutes into the existing 60-minute appointment
         Appointment overlapping = appointment(employeeId, existingStart.plusMinutes(30), service(30));
 
-        when(appointmentRepo.findAppointmentsByEmployeeId(employeeId)).thenReturn(List.of(existing));
+        when(appointmentRepo.findAppointmentsByEmployee_Id(employeeId)).thenReturn(List.of(existing));
 
         ResponseEntity<String> response = appointmentController.addAppointment(overlapping);
 
@@ -68,15 +83,15 @@ public class AppointmentControllerTest {
 
     @Test
     public void acceptsAppointmentImmediatelyAfterExistingEnds() {
-        int employeeId = 1;
+        long employeeId = 1L;
         LocalDateTime existingStart = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0);
         Appointment existing = appointment(employeeId, existingStart, service(60));
 
         // starts exactly when the existing 60-minute appointment ends -- no overlap
         Appointment adjacent = appointment(employeeId, existingStart.plusMinutes(60), service(30));
 
-        when(appointmentRepo.findAppointmentsByEmployeeId(employeeId)).thenReturn(List.of(existing));
-        when(appointmentRepo.findAppointmentByEmployeeIdAndDateTime(employeeId, adjacent.getDateTime())).thenReturn(null);
+        when(appointmentRepo.findAppointmentsByEmployee_Id(employeeId)).thenReturn(List.of(existing));
+        when(appointmentRepo.findAppointmentByEmployee_IdAndDateTime(employeeId, adjacent.getDateTime())).thenReturn(null);
 
         ResponseEntity<String> response = appointmentController.addAppointment(adjacent);
 
@@ -86,15 +101,15 @@ public class AppointmentControllerTest {
 
     @Test
     public void acceptsAppointmentBeforeExistingStarts() {
-        int employeeId = 1;
+        long employeeId = 1L;
         LocalDateTime existingStart = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0);
         Appointment existing = appointment(employeeId, existingStart, service(60));
 
         // ends exactly when the existing appointment starts -- no overlap
         Appointment before = appointment(employeeId, existingStart.minusMinutes(30), service(30));
 
-        when(appointmentRepo.findAppointmentsByEmployeeId(employeeId)).thenReturn(List.of(existing));
-        when(appointmentRepo.findAppointmentByEmployeeIdAndDateTime(employeeId, before.getDateTime())).thenReturn(null);
+        when(appointmentRepo.findAppointmentsByEmployee_Id(employeeId)).thenReturn(List.of(existing));
+        when(appointmentRepo.findAppointmentByEmployee_IdAndDateTime(employeeId, before.getDateTime())).thenReturn(null);
 
         ResponseEntity<String> response = appointmentController.addAppointment(before);
 
@@ -103,9 +118,31 @@ public class AppointmentControllerTest {
     }
 
     @Test
+    public void rejectsAppointmentWithNoEmployee() {
+        Appointment appointment = appointment(1L, LocalDateTime.now().plusDays(1), service(30));
+        appointment.setEmployee(null);
+
+        ResponseEntity<String> response = appointmentController.addAppointment(appointment);
+
+        Verify.Object.equals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        Verify.String.equals(response.getBody(), "Employee is required.");
+    }
+
+    @Test
+    public void rejectsAppointmentWithNoCustomer() {
+        Appointment appointment = appointment(1L, LocalDateTime.now().plusDays(1), service(30));
+        appointment.setCustomer(null);
+
+        ResponseEntity<String> response = appointmentController.addAppointment(appointment);
+
+        Verify.Object.equals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        Verify.String.equals(response.getBody(), "Customer is required.");
+    }
+
+    @Test
     public void deletesAppointmentThatExists() {
         long appointmentId = 5L;
-        when(appointmentRepo.findById(appointmentId)).thenReturn(appointment(1, LocalDateTime.now().plusDays(1), service(30)));
+        when(appointmentRepo.findById(appointmentId)).thenReturn(appointment(1L, LocalDateTime.now().plusDays(1), service(30)));
 
         ResponseEntity<String> response = appointmentController.deleteAppointment(appointmentId);
 

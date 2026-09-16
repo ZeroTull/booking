@@ -9,13 +9,13 @@ import java.util.List;
 
 @Repository
 public interface AppointmentRepo extends CrudRepository<Appointment, Long> {
-    List<Appointment> findAllByEmployeeId(long employeeId);
+    List<Appointment> findAllByEmployee_Id(long employeeId);
 
-    List<Appointment> findAllByCustomerEmail(String customerEmail);
+    List<Appointment> findAllByCustomer_Email(String customerEmail);
 
-    Appointment findAppointmentByEmployeeIdAndDateTime(long employeeId, LocalDateTime date);
+    Appointment findAppointmentByEmployee_IdAndDateTime(long employeeId, LocalDateTime date);
 
-    List<Appointment> findAppointmentsByEmployeeId(long employeeId);
+    List<Appointment> findAppointmentsByEmployee_Id(long employeeId);
 
     void deleteById(long appointmentId);
 
