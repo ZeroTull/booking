@@ -47,9 +47,13 @@ public class AppointmentController {
         //check that new appointment is not in the range of already existing appointments of employee.
         List<Appointment> appointmentList = appointmentRepo.findAppointmentsByEmployeeId(appointment.getEmployeeId());
 
-        //TODO - test this manually + create some tests for this
+        LocalDateTime newStart = appointment.getDateTime();
+        LocalDateTime newEnd = newStart.plusMinutes(appointment.getService().getDurationInMinutes());
         for (Appointment a : appointmentList) {
-            if (appointment.getDateTime().isAfter(a.getDateTime()) || appointment.getDateTime().isBefore(a.getDateTime().plusMinutes(a.getService().getDurationInMinutes()))) {
+            LocalDateTime existingStart = a.getDateTime();
+            LocalDateTime existingEnd = existingStart.plusMinutes(a.getService().getDurationInMinutes());
+            boolean overlaps = newStart.isBefore(existingEnd) && existingStart.isBefore(newEnd);
+            if (overlaps) {
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .body("This time slot is not available.");
