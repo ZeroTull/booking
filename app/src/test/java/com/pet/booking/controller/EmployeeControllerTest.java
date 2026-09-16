@@ -39,6 +39,7 @@ public class EmployeeControllerTest {
         employee.setFirstName("Jane");
         employee.setLastName("Doe");
         employee.setEmail("jane.doe@mail.mail");
+        employee.setPhoneNumber("555-1234");
         employee.setPassword("super-secret");
 
         when(employeeRepo.findById(employeeId)).thenReturn(Optional.of(employee));
@@ -46,10 +47,14 @@ public class EmployeeControllerTest {
         EmployeeDTO actual = employeeController.findById(employeeId);
 
         // findById used to return the raw Employee entity, serializing its password field
-        // straight into the JSON response. EmployeeDTO has no password field at all.
+        // straight into the JSON response. EmployeeDTO has no password field at all, so it's
+        // structurally impossible for the fields below to include it.
         Verifier verifier = new Verifier();
-        verifier.String.equals(actual.getEmail(), "jane.doe@mail.mail");
+        verifier.Long.equals(actual.getId(), employeeId);
         verifier.String.equals(actual.getFirstName(), "Jane");
+        verifier.String.equals(actual.getLastName(), "Doe");
+        verifier.String.equals(actual.getEmail(), "jane.doe@mail.mail");
+        verifier.String.equals(actual.getPhoneNumber(), "555-1234");
         verifier.verify();
     }
 
@@ -58,11 +63,9 @@ public class EmployeeControllerTest {
         long invalidId = 100L;
         when(employeeRepo.findById(invalidId)).thenReturn(Optional.empty());
 
-        try {
-            employeeController.findById(invalidId);
-            Assert.fail("Expected ResponseStatusException was not thrown");
-        } catch (ResponseStatusException exception) {
-            Verify.Object.equals(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
-        }
+        ResponseStatusException exception = Assert.expectThrows(ResponseStatusException.class,
+                () -> employeeController.findById(invalidId));
+
+        Verify.Object.equals(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
     }
 }
