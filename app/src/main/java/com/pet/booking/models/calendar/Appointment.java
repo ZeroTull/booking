@@ -1,4 +1,4 @@
-package com.pet.booking.models.bookingCalendar;
+package com.pet.booking.models.calendar;
 
 import com.pet.booking.models.Customer;
 import com.pet.booking.models.Employee;
