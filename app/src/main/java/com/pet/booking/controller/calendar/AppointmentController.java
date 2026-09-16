@@ -81,14 +81,14 @@ public class AppointmentController {
 
     @DeleteMapping(path = "/{appointmentId}")
     public ResponseEntity<String> deleteAppointment(long appointmentId) {
-        if (appointmentRepo.findById(appointmentId) != null) {
+        if (appointmentRepo.findById(appointmentId) == null) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Appointment with this id does not exist.");
         }
 
         appointmentRepo.deleteById(appointmentId);
-        logger.info("Appointment #%s deleted." + appointmentId);
+        logger.info(String.format("Appointment #%s deleted.", appointmentId));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
