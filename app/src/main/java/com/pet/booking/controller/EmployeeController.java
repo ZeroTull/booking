@@ -63,11 +63,11 @@ public class EmployeeController {
     }
 
     @GetMapping(value = "/{id}")
-    public Employee findById(@PathVariable long id) {
+    public EmployeeDTO findById(@PathVariable long id) {
         Optional<Employee> employee = employeeRepo.findById(id);
         if (employee.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Employee with %s id does not exist.", id));
         }
-        return ResponseEntity.ok(employee.get()).getBody();
+        return ObjectMapperUtils.map(employee.get(), EmployeeDTO.class);
     }
 }
