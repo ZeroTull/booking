@@ -1,11 +1,8 @@
 package com.pet.booking.controller.base;
 
-import com.pet.booking.controller.CustomerController;
 import com.pet.booking.models.Service;
 import com.pet.booking.repo.ServiceRepo;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,8 +18,6 @@ import static com.pet.booking.controller.base.ApiDefinition.ADMIN_RESOURCE_ROOT;
 @RestController
 @RequestMapping(value = ADMIN_RESOURCE_ROOT)
 public class AdminController {
-    Logger logger = LoggerFactory.getLogger(CustomerController.class);
-
     @Autowired
     private ServiceRepo serviceRepo;
 
@@ -37,7 +32,7 @@ public class AdminController {
         }
 
         serviceRepo.save(dto);
-        logger.info(String.format("Created %s service type.", dto.getServiceTypeName()));
+        log.info(String.format("Created %s service type.", dto.getServiceTypeName()));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
