@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,6 +26,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class EmployeeController {
     @Autowired
     private EmployeeRepo employeeRepo;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     @GetMapping(value = "/getEmployees")
@@ -40,6 +43,7 @@ public class EmployeeController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(String.format("Employee with %s email already exists.", employee.getEmail()));
         }
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         employeeRepo.save(employee);
         logger.info("Created employee with " + employee.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).build();
