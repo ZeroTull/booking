@@ -190,6 +190,7 @@ public class AppointmentControllerTest {
         verifier.Long.equals(dto.getId(), 9L);
         verifier.String.equals(dto.getEmployee().getFirstName(), "Jane");
         verifier.String.equals(dto.getCustomer().getFirstName(), "John");
+        verifier.Bool.isTrue(dto.isActive());
         // EmployeeDTO has no password field at all -- structurally impossible to leak it here,
         // same guarantee as EmployeeController.findById's fix.
         verifier.verify();

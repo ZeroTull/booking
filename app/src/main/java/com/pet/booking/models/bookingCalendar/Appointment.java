@@ -5,6 +5,8 @@ import com.pet.booking.models.Employee;
 import com.pet.booking.models.Service;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -20,13 +22,22 @@ public class Appointment {
     // Was a raw `int employeeId` with no FK -- nothing stopped an appointment from
     // referencing an employee id that didn't exist, and deleting an employee silently
     // orphaned their appointments instead of being blocked or cascaded.
+    // Excluded from equals/hashCode/toString: both are LAZY, and Lombok's @Data-generated
+    // methods would otherwise trigger Hibernate proxy initialization (or throw
+    // LazyInitializationException outside a session) any time this entity's toString/equals
+    // is called anywhere -- e.g. logging -- not just in the JSON-serialization path the DTO
+    // layer already protects.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EMPLOYEE_ID")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Employee employee;
     // Was denormalized `customerName`/`customerEmail` strings instead of a real
     // relation -- same integrity gap as employeeId above.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CUSTOMER_ID")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Customer customer;
     @Column
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
