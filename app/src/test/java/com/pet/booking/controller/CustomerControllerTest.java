@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -145,5 +146,26 @@ public class CustomerControllerTest {
             verifier.String.equals(exception.getReason(), String.format("Customer with %s id does not exist.", invalidId));
             verifier.verify();
         }
+    }
+
+    @Test
+    public void addCustomerWithDuplicateEmailReturnsBadRequestInsteadOfCrashing() {
+        String email = RandomStringUtils.randomAlphabetic(5).concat("@mail.mail");
+        Customer existing = new Customer();
+        existing.setEmail(email);
+
+        Customer duplicate = new Customer();
+        duplicate.setEmail(email);
+
+        when(customerRepo.findByEmail(email)).thenReturn(existing);
+
+        // addCustomer used to call HttpStatus.valueOf(<a sentence>), which throws
+        // IllegalArgumentException at runtime instead of returning this 400.
+        ResponseEntity<String> response = customerController.addCustomer(duplicate);
+
+        Verifier verifier = new Verifier();
+        verifier.Object.equals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        verifier.String.equals(response.getBody(), String.format("Customer with %s email already exists.", email));
+        verifier.verify();
     }
 }
